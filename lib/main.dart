@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:darts_with_friends/game.dart';
+import 'package:darts_with_friends/preGameSetup.dart';
 void main() {
   runApp(const MaterialApp(
     home: Home(),
@@ -47,7 +48,7 @@ class Home extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
                             onPressed: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>const Game()));
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>const GameSetup()));
                             },
                             child: Text("Start")
                         ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import "package:flutter/services.dart";
+import 'package:darts_with_friends/widgets/textInputForDarts.dart';
+
 class GameScore{
   int dart1;
   int dart2;
@@ -9,13 +11,19 @@ class GameScore{
   GameScore(this.dart1, this.dart2, this.dart3, this.playerFlag);
 
   int sumDarts(){
-    return dart1+dart2+dart3;
+    int dart1clamped = dart1.clamp(0, 60);
+    int dart2clamped = dart2.clamp(0, 60);
+    int dart3clamped = dart3.clamp(0, 60);
+    return dart1clamped+dart2clamped+dart3clamped;
   }
 }
 
 
 class Game extends StatefulWidget {
-  const Game({super.key});
+  final int numberOfPlayers;
+  final List<String> playerNames;
+  final int mainScore;
+  Game({super.key, required this.numberOfPlayers, required this.playerNames, required this.mainScore});
 
   @override
   State<Game> createState() => _GameState();
@@ -27,16 +35,17 @@ class _GameState extends State<Game> {
   final TextEditingController _dart2controller = TextEditingController();
   final TextEditingController _dart3controller = TextEditingController();
 
-  int mainScore = 501;
+
   List<int> playerScores = [];
   int currentPlayer = 1;
   List<GameScore> scoreList = [];
-  int currentPlayerValue = 501;
+  int currentPlayerValue = 0;
 
   @override
   void initState(){
     super.initState();
-    playerScores = List<int>.filled(2,501);
+    currentPlayerValue = widget.mainScore;
+    playerScores = List<int>.filled(widget.numberOfPlayers,widget.mainScore);
   }
 
 
@@ -83,39 +92,16 @@ class _GameState extends State<Game> {
           Row(
             children: <Widget>[
               Flexible(
-                  child: TextField(
-                    controller: _dart1controller,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                    ),
-                  )
+                  child: DartTextInput(controller: _dart1controller),
               ),
               SizedBox(width: 10,),
-              Flexible(child: TextField(
-                controller: _dart2controller,
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
-              )),
+              Flexible(
+                  child: DartTextInput(controller: _dart2controller),
+              ),
               SizedBox(width: 10,),
-              Flexible(child: TextField(
-                controller: _dart3controller,
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
-              )),
+              Flexible(
+                  child: DartTextInput(controller: _dart3controller),
+              ),
             ],
           ),
           ElevatedButton(onPressed: submitScore, child: Text("Submit score")),
