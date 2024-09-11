@@ -23,14 +23,15 @@ class Game extends StatefulWidget {
 
 
 class _GameState extends State<Game> {
-  TextEditingController _dart1controller = TextEditingController();
-  TextEditingController _dart2controller = TextEditingController();
-  TextEditingController _dart3controller = TextEditingController();
+  final TextEditingController _dart1controller = TextEditingController();
+  final TextEditingController _dart2controller = TextEditingController();
+  final TextEditingController _dart3controller = TextEditingController();
 
   int mainScore = 501;
   List<int> playerScores = [];
   int currentPlayer = 1;
   List<GameScore> scoreList = [];
+  int currentPlayerValue = 501;
 
   @override
   void initState(){
@@ -38,19 +39,24 @@ class _GameState extends State<Game> {
     playerScores = List<int>.filled(2,501);
   }
 
-  void changePlayer(){
-    if(currentPlayer==1){
-      currentPlayer=2;
-    }else currentPlayer=1;
-  }
+
 
   void submitScore(){
+    GameScore score = GameScore(
+        int.parse(_dart1controller.text),
+        int.parse(_dart2controller.text),
+        int.parse(_dart3controller.text),
+        currentPlayer);
+    scoreList.add(score);
+
+    _dart1controller.clear();
+    _dart2controller.clear();
+    _dart3controller.clear();
 
     setState(() {
-      GameScore score = GameScore(int.parse(_dart1controller.text),int.parse(_dart2controller.text),int.parse(_dart3controller.text), currentPlayer);
-      scoreList.add(score);
       playerScores[currentPlayer-1] = playerScores[currentPlayer-1] - score.sumDarts();
       currentPlayer = (currentPlayer%2) + 1;
+      currentPlayerValue=playerScores[currentPlayer-1];
     });
   }
 
@@ -68,15 +74,8 @@ class _GameState extends State<Game> {
               Column(
 
                 children: [
-                  Text("Player 1"),
-                  Text("$playerScores"),
-                ],
-              ),
-              SizedBox(width: 50,),
-              Column(
-                children: [
-                  Text("PLAYER 2"),
-                  Text("$playerScores"),
+                  Text("Player $currentPlayer"),
+                  Text("$currentPlayerValue"),
                 ],
               ),
             ],
