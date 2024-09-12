@@ -18,6 +18,14 @@ class _GameSetupState extends State<GameSetup> {
   int numberOfPlayers=0;
   List<String> playerNames = [];
   @override
+
+  void callErrorMessage(){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("You must add atleast two players")),
+    );
+  }
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -47,10 +55,34 @@ class _GameSetupState extends State<GameSetup> {
           ),
           Text("Add player"),
           PlayerTextInput(controller: controller),
-          ElevatedButton(onPressed: (){
-            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Game(numberOfPlayers: 2, playerNames: playerNames, mainScore: selectedScore,)));
+          ElevatedButton(
+              onPressed: (){
+                setState(() {
+                  playerNames.add(controller.text.trim());
+                  numberOfPlayers=numberOfPlayers+1;
+                });
+
+              },
+              child: Text("Submit name")
+          ),
+          ElevatedButton(
+              onPressed: numberOfPlayers < 2 ? callErrorMessage : (){
+            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Game(numberOfPlayers: numberOfPlayers, playerNames: playerNames, mainScore: selectedScore,)));
           },
-              child: Text("Start game")),
+              child: Text("Start game")
+          ),
+          Text("Players"),
+          Expanded(
+            child: ListView.builder(
+              itemCount: playerNames.length,
+              itemBuilder: (context, index){
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 0.5, horizontal: 5.0),
+                  child: Text(playerNames[index]),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import "package:flutter/services.dart";
+import 'dart:async';
 import 'package:darts_with_friends/widgets/textInputForDarts.dart';
+import "package:darts_with_friends/main.dart";
 
 class GameScore{
   int dart1;
@@ -38,35 +40,63 @@ class _GameState extends State<Game> {
 
   List<int> playerScores = [];
   int currentPlayer = 1;
+  String currentPlayerName="";
   List<GameScore> scoreList = [];
   int currentPlayerValue = 0;
 
   @override
   void initState(){
     super.initState();
+
     currentPlayerValue = widget.mainScore;
     playerScores = List<int>.filled(widget.numberOfPlayers,widget.mainScore);
+    currentPlayerName=widget.playerNames.first;
+
   }
 
-
+  void callSnackBarMessage(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 
   void submitScore(){
     GameScore score = GameScore(
-        int.parse(_dart1controller.text),
-        int.parse(_dart2controller.text),
-        int.parse(_dart3controller.text),
+        int.tryParse(_dart1controller.text) ?? 0,
+        int.tryParse(_dart2controller.text) ?? 0,
+        int.tryParse(_dart3controller.text) ?? 0,
         currentPlayer);
     scoreList.add(score);
+
+    int dartSum = score.sumDarts();
+
+
+
+    setState(() {
+
+      if(currentPlayerValue - dartSum == 0){
+        callSnackBarMessage(currentPlayerName + " has won!");
+
+        Timer(Duration(seconds: 3), (){
+          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Home()));
+        });
+      }else if(currentPlayerValue - dartSum < 0){
+        callSnackBarMessage(currentPlayerName + " has went overboard");
+
+        currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
+        currentPlayerValue = playerScores[currentPlayer-1];
+        currentPlayerName = widget.playerNames[currentPlayer-1];
+      }else {
+        playerScores[currentPlayer-1] -= dartSum;
+        currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
+        currentPlayerValue = playerScores[currentPlayer-1];
+        currentPlayerName = widget.playerNames[currentPlayer-1];
+      }
+    });
 
     _dart1controller.clear();
     _dart2controller.clear();
     _dart3controller.clear();
-
-    setState(() {
-      playerScores[currentPlayer-1] = playerScores[currentPlayer-1] - score.sumDarts();
-      currentPlayer = (currentPlayer%2) + 1;
-      currentPlayerValue=playerScores[currentPlayer-1];
-    });
   }
 
   @override
@@ -83,7 +113,7 @@ class _GameState extends State<Game> {
               Column(
 
                 children: [
-                  Text("Player $currentPlayer"),
+                  Text("Player: $currentPlayerName, $currentPlayer"),
                   Text("$currentPlayerValue"),
                 ],
               ),
