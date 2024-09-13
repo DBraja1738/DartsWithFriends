@@ -3,12 +3,14 @@ import "package:flutter/services.dart";
 import 'dart:async';
 import 'package:darts_with_friends/widgets/textInputForDarts.dart';
 import "package:darts_with_friends/main.dart";
+import 'package:darts_with_friends/widgets/navbar.dart';
 
 class GameScore{
   int dart1;
   int dart2;
   int dart3;
   int playerFlag;
+
 
   GameScore(this.dart1, this.dart2, this.dart3, this.playerFlag);
 
@@ -18,6 +20,15 @@ class GameScore{
     int dart3clamped = dart3.clamp(0, 60);
     return dart1clamped+dart2clamped+dart3clamped;
   }
+
+  bool hasWon(int currentScore, int dartThrown, bool gamemode){
+    if(currentScore - dartThrown == 0){
+      if(gamemode){
+        return dartThrown<=20; //single out
+      }else return dartThrown<=40 && dartThrown.isEven; //dupli out
+    }
+    return false;
+  }
 }
 
 
@@ -25,7 +36,8 @@ class Game extends StatefulWidget {
   final int numberOfPlayers;
   final List<String> playerNames;
   final int mainScore;
-  Game({super.key, required this.numberOfPlayers, required this.playerNames, required this.mainScore});
+  bool gameMode; //true za single out, false za dupli out
+  Game({super.key, required this.numberOfPlayers, required this.playerNames, required this.mainScore, required this.gameMode});
 
   @override
   State<Game> createState() => _GameState();
@@ -51,7 +63,7 @@ class _GameState extends State<Game> {
     currentPlayerValue = widget.mainScore;
     playerScores = List<int>.filled(widget.numberOfPlayers,widget.mainScore);
     currentPlayerName=widget.playerNames.first;
-
+    print(widget.gameMode);
   }
 
   void callSnackBarMessage(String message){
@@ -62,47 +74,105 @@ class _GameState extends State<Game> {
 
   void submitScore(){
     GameScore score = GameScore(
-        int.tryParse(_dart1controller.text) ?? 0,
-        int.tryParse(_dart2controller.text) ?? 0,
-        int.tryParse(_dart3controller.text) ?? 0,
+        (int.tryParse(_dart1controller.text) ?? 0).clamp(0, 60),
+        (int.tryParse(_dart2controller.text) ?? 0).clamp(0, 60),
+        (int.tryParse(_dart3controller.text) ?? 0).clamp(0, 60),
         currentPlayer);
     scoreList.add(score);
-
-    int dartSum = score.sumDarts();
 
 
 
     setState(() {
+      int previousScore = playerScores[currentPlayer - 1];
+      int currentScore = previousScore;
 
-      if(currentPlayerValue - dartSum == 0){
-        callSnackBarMessage(currentPlayerName + " has won!");
+      bool hasWonGame = false;
 
-        Timer(Duration(seconds: 3), (){
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const Home()));
-        });
-      }else if(currentPlayerValue - dartSum < 0){
-        callSnackBarMessage(currentPlayerName + " has went overboard");
+      // Dart 1
+      if (currentScore - score.dart1 >= 0) {
+        currentScore -= score.dart1;
+        print("provjera za prvu strelicu");
+        if (score.hasWon(currentScore, score.dart1, widget.gameMode)) {
+          hasWonGame = true;
+          callSnackBarMessage(currentPlayerName + " has won!");
 
-        currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
-        currentPlayerValue = playerScores[currentPlayer-1];
-        currentPlayerName = widget.playerNames[currentPlayer-1];
-      }else {
-        playerScores[currentPlayer-1] -= dartSum;
-        currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
-        currentPlayerValue = playerScores[currentPlayer-1];
-        currentPlayerName = widget.playerNames[currentPlayer-1];
+        }
+      } else{
+        print("revert");
+        playerScores[currentPlayer - 1] = previousScore;  // Revert to previous score
       }
-    });
+
+      if (currentScore - score.dart2 >= 0) {
+        currentScore -= score.dart2;
+        print("provjera za 2 strelicu");
+        if (score.hasWon(currentScore, score.dart2, widget.gameMode)) {
+          hasWonGame = true;
+          callSnackBarMessage(currentPlayerName + " has won!");
+
+        }
+      } else{
+        print("revert");
+        playerScores[currentPlayer - 1] = previousScore;  // Revert to previous score
+      }
+
+      if (currentScore - score.dart3 >= 0) {
+        currentScore -= score.dart3;
+        print("provjera za 3 strelicu");
+        if (score.hasWon(currentScore, score.dart3, widget.gameMode)) {
+          hasWonGame = true;
+          callSnackBarMessage(currentPlayerName + " has won!");
+
+        }
+      }else{
+        print("revert");
+        playerScores[currentPlayer - 1] = previousScore;  // Revert to previous score
+      }
+
+      playerScores[currentPlayer-1] = currentScore;
+      //playerScores[currentPlayer-1] -= score.sumDarts();
+      // Move to the next player if not won
+      if (!hasWonGame) {
+        currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
+        currentPlayerName = widget.playerNames[currentPlayer-1];
+        currentPlayerValue = playerScores[currentPlayer-1];
+      }
+      });
+    print(playerScores);
 
     _dart1controller.clear();
     _dart2controller.clear();
     _dart3controller.clear();
   }
 
+  void undoLastScore() {
+    if (scoreList.isNotEmpty) {
+      setState(() {
+        GameScore lastScore = scoreList.removeLast();
+        playerScores[lastScore.playerFlag - 1] += lastScore.sumDarts();
+        currentPlayer = lastScore.playerFlag;
+
+        currentPlayerValue = playerScores[currentPlayer-1];
+        currentPlayerName = widget.playerNames[currentPlayer-1];
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Navbar(initialPlayerNames: widget.playerNames, initialPlayerScores: playerScores),
       appBar: AppBar(
+        leading: Builder(
+            builder: (BuildContext context){
+              return IconButton(
+                icon: Icon(Icons.person),
+                onPressed: (){
+                  Scaffold.of(context).openDrawer();
+                },
+              );
+            }
+        ),
         title: Text("Hello game"),
       ),
       body: Column(
@@ -134,10 +204,20 @@ class _GameState extends State<Game> {
               ),
             ],
           ),
-          ElevatedButton(onPressed: submitScore, child: Text("Submit score")),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+
+              ElevatedButton(onPressed: submitScore, child: Text("Submit score")),
+              ElevatedButton(onPressed: undoLastScore, child: Text("Undo last round")),
+
+            ],
+          )
+
         ],
       )
     );
+
   }
 }
 

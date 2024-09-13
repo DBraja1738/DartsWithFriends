@@ -17,6 +17,8 @@ class _GameSetupState extends State<GameSetup> {
   List<int> scoreOptions = [180,301,501,701];
   int numberOfPlayers=0;
   List<String> playerNames = [];
+  bool selectedGamemode = true;
+
   @override
 
   void callErrorMessage(){
@@ -53,6 +55,28 @@ class _GameSetupState extends State<GameSetup> {
 
             ),
           ),
+          Text("Select gamemode"),
+          RadioListTile<bool>(
+              title: Text("Single Out"),
+              value: true,
+              groupValue: selectedGamemode,
+              onChanged: (value){
+                setState(() {
+                  selectedGamemode = value!;
+                });
+              }
+          ),
+          RadioListTile<bool>(
+              title: Text("Double Out"),
+              value: false,
+              groupValue: selectedGamemode,
+              onChanged: (value){
+                setState(() {
+                  selectedGamemode = value!;
+                });
+              }
+          ),
+
           Text("Add player"),
           PlayerTextInput(controller: controller),
           ElevatedButton(
@@ -67,7 +91,7 @@ class _GameSetupState extends State<GameSetup> {
           ),
           ElevatedButton(
               onPressed: numberOfPlayers < 2 ? callErrorMessage : (){
-            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Game(numberOfPlayers: numberOfPlayers, playerNames: playerNames, mainScore: selectedScore,)));
+            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Game(numberOfPlayers: numberOfPlayers, playerNames: playerNames, mainScore: selectedScore, gameMode: selectedGamemode)));
           },
               child: Text("Start game")
           ),
