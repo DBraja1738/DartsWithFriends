@@ -25,7 +25,7 @@ class GameScore{
     if(currentScore - dartThrown == 0){
       if(gamemode){
         return dartThrown<=20; //single out
-      }else return dartThrown<=40 && dartThrown.isEven; //dupli out
+      }else return dartThrown<=40 && dartThrown.isEven && dartThrown != 0; //dupli out
     }
     return false;
   }
@@ -83,58 +83,63 @@ class _GameState extends State<Game> {
 
 
     setState(() {
+      // TODO: edge case sa praznim textboxom/nulom da se broji kao pobjeda npr. 25,5,0 se broji kao pobjeda za double out
+
       int previousScore = playerScores[currentPlayer - 1];
       int currentScore = previousScore;
 
       bool hasWonGame = false;
+      bool wentOver = false; // New flag to track if the score went overboard
 
-      // Dart 1
+// Dart 1
       if (currentScore - score.dart1 >= 0) {
         currentScore -= score.dart1;
-        print("provjera za prvu strelicu");
+        print("Checking first dart");
         if (score.hasWon(currentScore, score.dart1, widget.gameMode)) {
           hasWonGame = true;
           callSnackBarMessage(currentPlayerName + " has won!");
-
         }
-      } else{
-        print("revert");
-        playerScores[currentPlayer - 1] = previousScore;  // Revert to previous score
+      } else {
+        wentOver = true;
       }
 
-      if (currentScore - score.dart2 >= 0) {
+// Dart 2
+      if (!hasWonGame && currentScore - score.dart2 >= 0) {
         currentScore -= score.dart2;
-        print("provjera za 2 strelicu");
+        print("Checking second dart");
         if (score.hasWon(currentScore, score.dart2, widget.gameMode)) {
           hasWonGame = true;
           callSnackBarMessage(currentPlayerName + " has won!");
-
         }
-      } else{
-        print("revert");
-        playerScores[currentPlayer - 1] = previousScore;  // Revert to previous score
+      } else if (!hasWonGame) {
+        wentOver = true;
       }
 
-      if (currentScore - score.dart3 >= 0) {
+// Dart 3
+      if (!hasWonGame && currentScore - score.dart3 >= 0) {
         currentScore -= score.dart3;
-        print("provjera za 3 strelicu");
+        print("Checking third dart");
         if (score.hasWon(currentScore, score.dart3, widget.gameMode)) {
           hasWonGame = true;
           callSnackBarMessage(currentPlayerName + " has won!");
-
         }
-      }else{
-        print("revert");
-        playerScores[currentPlayer - 1] = previousScore;  // Revert to previous score
+      } else if (!hasWonGame) {
+        wentOver = true;
       }
 
-      playerScores[currentPlayer-1] = currentScore;
-      //playerScores[currentPlayer-1] -= score.sumDarts();
-      // Move to the next player if not won
+// If no win condition is met and the player went overboard, revert the score
+      if (wentOver && !hasWonGame) {
+        print("Reverting score as player went overboard.");
+        currentScore = previousScore;
+      }
+
+      playerScores[currentPlayer - 1] = currentScore;
+
+// Move to the next player if not won
       if (!hasWonGame) {
         currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
-        currentPlayerName = widget.playerNames[currentPlayer-1];
-        currentPlayerValue = playerScores[currentPlayer-1];
+        currentPlayerName = widget.playerNames[currentPlayer - 1];
+        currentPlayerValue = playerScores[currentPlayer - 1];
       }
       });
     print(playerScores);
