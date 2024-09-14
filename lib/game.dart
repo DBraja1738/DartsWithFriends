@@ -36,7 +36,7 @@ class Game extends StatefulWidget {
   final int numberOfPlayers;
   final List<String> playerNames;
   final int mainScore;
-  bool gameMode; //true za single out, false za dupli out
+  final bool gameMode; //true za single out, false za dupli out
   Game({super.key, required this.numberOfPlayers, required this.playerNames, required this.mainScore, required this.gameMode});
 
   @override
@@ -89,9 +89,9 @@ class _GameState extends State<Game> {
       int currentScore = previousScore;
 
       bool hasWonGame = false;
-      bool wentOver = false; // New flag to track if the score went overboard
+      bool wentOver = false;
 
-// Dart 1
+
       if (currentScore - score.dart1 >= 0) {
         currentScore -= score.dart1;
         print("Checking first dart");
@@ -103,7 +103,7 @@ class _GameState extends State<Game> {
         wentOver = true;
       }
 
-// Dart 2
+
       if (!hasWonGame && currentScore - score.dart2 >= 0) {
         currentScore -= score.dart2;
         print("Checking second dart");
@@ -115,7 +115,7 @@ class _GameState extends State<Game> {
         wentOver = true;
       }
 
-// Dart 3
+
       if (!hasWonGame && currentScore - score.dart3 >= 0) {
         currentScore -= score.dart3;
         print("Checking third dart");
@@ -127,15 +127,14 @@ class _GameState extends State<Game> {
         wentOver = true;
       }
 
-// If no win condition is met and the player went overboard, revert the score
-      if (wentOver && !hasWonGame) {
+
+      if (wentOver) {
         print("Reverting score as player went overboard.");
         currentScore = previousScore;
       }
 
       playerScores[currentPlayer - 1] = currentScore;
 
-// Move to the next player if not won
       if (!hasWonGame) {
         currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
         currentPlayerName = widget.playerNames[currentPlayer - 1];

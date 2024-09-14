@@ -3,7 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:darts_with_friends/game.dart';
 import 'package:darts_with_friends/preGameSetup.dart';
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'package:darts_with_friends/accounts.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MaterialApp(
     home: Home(),
 
@@ -57,8 +62,9 @@ class Home extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
                             onPressed: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=> AccountTab()));
                             },
-                            child: Text("Settings")
+                            child: Text("Accounts")
                         ),
                       ),
                       Padding(

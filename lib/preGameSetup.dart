@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import "package:darts_with_friends/game.dart";
 import "package:darts_with_friends/widgets/textInputForPlayers.dart";
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GameSetup extends StatefulWidget {
   const GameSetup({super.key});
@@ -13,6 +13,7 @@ class GameSetup extends StatefulWidget {
 class _GameSetupState extends State<GameSetup> {
   TextEditingController controller = TextEditingController();
 
+  List<String> loggedInPlayers = [];
   int selectedScore=501;
   List<int> scoreOptions = [180,301,501,701];
   int numberOfPlayers=0;
@@ -20,6 +21,23 @@ class _GameSetupState extends State<GameSetup> {
   bool selectedGamemode = true;
 
   @override
+  void initState(){
+    super.initState();
+    _loadLoggedInPlayers();
+
+  }
+
+  Future<List<String>> getUsers() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList('emails') ?? [];
+  }
+
+  Future<void> _loadLoggedInPlayers() async {
+    List<String> players = await getUsers();
+    setState(() {
+      loggedInPlayers = players;
+    });
+  }
 
   void callErrorMessage(){
     ScaffoldMessenger.of(context).showSnackBar(
@@ -27,7 +45,7 @@ class _GameSetupState extends State<GameSetup> {
     );
   }
 
-
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -95,6 +113,7 @@ class _GameSetupState extends State<GameSetup> {
           },
               child: Text("Start game")
           ),
+
           Text("Players"),
           Expanded(
             child: ListView.builder(

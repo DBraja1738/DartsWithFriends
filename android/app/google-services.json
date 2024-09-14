@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "364148159176",
+    "project_id": "darts-with-friends",
+    "storage_bucket": "darts-with-friends.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:364148159176:android:4bfccf52f9eff2ee466bfd",
+        "android_client_info": {
+          "package_name": "com.dbraja.darts_with_friends"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACaZfYq47_JubZ0-nF2E8XcL4vi-teP38"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
