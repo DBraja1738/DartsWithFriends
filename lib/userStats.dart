@@ -48,11 +48,14 @@ class UserStatsScreen extends StatelessWidget {
                 children: [
                   Text('Email: $email'),
                   SizedBox(height: 10),
+                  Text("3-dart average: ${data["3dartAverage"] ?? "No data"}"),
+                  SizedBox(height: 10,),
                   Text('Wins: ${data['wins'] ?? 'No data'}'),
                   SizedBox(height: 10),
                   Text('Number of Games: ${data['numberOfGames'] ?? 'No data'}'),
                   SizedBox(height: 10),
-                  Text('Winrate: ${data['winrate'] ?? 'No data'}'),
+                  Text('Winrate: ${data['winrate'] ?? 'No data'} %'),
+
                 ],
               ),
             );

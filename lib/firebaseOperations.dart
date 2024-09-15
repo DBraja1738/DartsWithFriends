@@ -23,20 +23,28 @@ Future<DocumentSnapshot> getUserByEmail(String email) async {
   }
 }
 
-void fetchWinnerUserAndUpdate(String email) async {
+void fetchWinnerUserAndUpdate(String email,int numberOfDartsThrown, int scoreGained) async {
   try {
      // Replace with the email you want to query
     DocumentSnapshot userDoc = await getUserByEmail(email);
 
     // Access user data from the document
     var userData = userDoc.data() as Map<String, dynamic>;
-    print('User Data: ${userData['uid']}');
 
     int currentWins = userData["wins"] ?? 0;
     int currentGames = userData["numberOfGames"] ?? 0;
+    int currentLifetimeDarts = userData["lifetimeDarts"] ?? 0;
+    int currentLifetimeScore = userData["lifetimeScore"] ?? 0;
+
 
     int updatedWins = currentWins+1;
     int updatedGames = currentGames+1;
+    int updatedLifetimeDarts = currentLifetimeDarts += numberOfDartsThrown;
+    int updatedLifetimeScore = currentLifetimeScore += scoreGained;
+
+
+
+    double updatedThreeDartAverage = (updatedLifetimeScore/updatedLifetimeDarts)*3;
     double updatedWinrate = (updatedWins/updatedGames)*100;
 
     DocumentReference userRef = userDoc.reference;
@@ -44,6 +52,9 @@ void fetchWinnerUserAndUpdate(String email) async {
       "wins": updatedWins,
       "numberOfGames": updatedGames,
       "winrate": updatedWinrate,
+      "3dartAverage": updatedThreeDartAverage,
+      "lifetimeDarts": updatedLifetimeDarts,
+      "lifetimeScore": updatedLifetimeScore
     });
 
   } catch (e) {
@@ -51,20 +62,28 @@ void fetchWinnerUserAndUpdate(String email) async {
   }
 }
 
-void fetchLoserUserAndUpdate(String email) async {
+void fetchLoserUserAndUpdate(String email, int numberOfDartsThrown, int totalScore) async {
   try {
     // Replace with the email you want to query
     DocumentSnapshot userDoc = await getUserByEmail(email);
 
     // Access user data from the document
     var userData = userDoc.data() as Map<String, dynamic>;
-    print('User Data: ${userData['uid']}');
 
     int currentWins = userData["wins"] ?? 0;
     int currentGames = userData["numberOfGames"] ?? 0;
 
+    int currentLifetimeDarts = userData["lifetimeDarts"] ?? 0;
+    int currentLifetimeScore = userData["lifetimeScore"] ?? 0;
 
+
+    int updatedWins = currentWins+1;
     int updatedGames = currentGames+1;
+    int updatedLifetimeDarts = currentLifetimeDarts += numberOfDartsThrown;
+    int updatedLifetimeScore = currentLifetimeScore += totalScore;
+
+    double updatedThreeDartAverage = (updatedLifetimeScore/updatedLifetimeDarts)*3;
+
     double updatedWinrate = (currentWins/updatedGames)*100;
 
 
@@ -74,6 +93,9 @@ void fetchLoserUserAndUpdate(String email) async {
       "wins": currentWins,
       "numberOfGames": updatedGames,
       "winrate": updatedWinrate,
+      "3dartAverage": updatedThreeDartAverage,
+      "lifetimeDarts": updatedLifetimeDarts,
+      "lifetimeScore": updatedLifetimeScore,
     });
 
   } catch (e) {

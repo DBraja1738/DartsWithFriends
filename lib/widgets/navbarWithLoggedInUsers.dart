@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:darts_with_friends/userStats.dart';
+import 'package:darts_with_friends/widgets/decorations.dart';
 
 class UserNavbar extends StatefulWidget {
   const UserNavbar({super.key});
@@ -51,7 +52,7 @@ class _UserNavbarState extends State<UserNavbar> {
     return Drawer(
       child: ListView(
         children: [
-          UserAccountsDrawerHeader(accountName: Text(""), accountEmail: Text("Logged in users")),
+          UserAccountsDrawerHeader(accountName: Text(""), accountEmail: Text("Logged in users"), decoration: AppDecorations.drawerHeaderDecoration,),
           ...List.generate(users.length, (index){
             return ListTile(
               onTap: (){

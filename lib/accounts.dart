@@ -91,6 +91,8 @@ class _AccountTabState extends State<AccountTab> {
       "3dartAverage": 0,
       "numberOfGames": 0,
       "winrate": 0,
+      "lifetimeDarts": 0,
+      "lifetimeScore": 0,
     });
   }
 

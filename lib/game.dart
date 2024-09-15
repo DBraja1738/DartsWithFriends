@@ -102,17 +102,24 @@ class _GameState extends State<Game> {
     int dartSum = score.sumDarts();
 
     setState(() {
-
+      if(currentPlayerValue - dartSum >= 0){
+        playerStats[currentPlayer-1].totalScore += dartSum;
+        playerStats[currentPlayer-1].totalDartsThrown +=3;
+      }
       if(currentPlayerValue - dartSum == 0){
         callSnackBarMessage(currentPlayerName + " has won!");
 
-        fetchWinnerUserAndUpdate(widget.playerNames[currentPlayer-1]);
-
+        fetchWinnerUserAndUpdate(widget.playerNames[currentPlayer-1], playerStats[currentPlayer-1].totalDartsThrown, playerStats[currentPlayer-1].totalScore);
+        playerStats.removeAt(currentPlayer-1);
         List<String> tempPlayerNames = widget.playerNames;
         tempPlayerNames.removeAt(currentPlayer-1);
-        tempPlayerNames.forEach((player){
-          fetchLoserUserAndUpdate(player);
-        });
+
+        for(int i=0;i<tempPlayerNames.length;i++){
+          fetchLoserUserAndUpdate(tempPlayerNames[i], playerStats[i].totalDartsThrown, playerStats[i].totalScore);
+        }
+        //tempPlayerNames.forEach((player){
+         // fetchLoserUserAndUpdate(player);
+        //});
 
         Timer(Duration(seconds: 3), (){
           Navigator.pop(context);
@@ -125,11 +132,6 @@ class _GameState extends State<Game> {
         currentPlayerName = widget.playerNames[currentPlayer-1];
       }else {
 
-        playerStats[currentPlayer-1].totalScore += dartSum;
-        playerStats[currentPlayer-1].totalDartsThrown +=3;
-
-        print(playerStats[currentPlayer-1].totalScore);
-        print(playerStats[currentPlayer-1].totalDartsThrown);
 
         playerScores[currentPlayer-1] -= dartSum;
         currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
@@ -207,14 +209,14 @@ class _GameState extends State<Game> {
               SizedBox(width: 10,),
               Flexible(
               child: TextField(
-                controller: _dart1controller,
+                controller: _dart2controller,
                 decoration: AppDecorations.inputDecoration,
               )
               ),
               SizedBox(width: 10,),
               Flexible(
                 child: TextField(
-                  controller: _dart1controller,
+                  controller: _dart3controller,
                   decoration: AppDecorations.inputDecoration,
                 )
               ),
