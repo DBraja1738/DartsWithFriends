@@ -45,6 +45,14 @@ class _GameSetupState extends State<GameSetup> {
     );
   }
 
+  void _removePlayer(int index) {
+    setState(() {
+      playerNames.removeAt(index);
+      numberOfPlayers--;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,13 +103,44 @@ class _GameSetupState extends State<GameSetup> {
               }
           ),
 
-          Text("Add player"),
-          PlayerTextInput(controller: controller),
+          if (loggedInPlayers.isNotEmpty) Text("Select logged-in players"),
+          if (loggedInPlayers.isNotEmpty)
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: loggedInPlayers.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(loggedInPlayers[index]),
+                    trailing: IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () {
+                        if (!playerNames.contains(loggedInPlayers[index])) {
+                          setState(() {
+                            playerNames.add(loggedInPlayers[index]);
+                            numberOfPlayers++;
+                          });
+                        }
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+
+          Text("Add guest player"),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            child: PlayerTextInput(controller: controller),
+          ),
           ElevatedButton(
               onPressed: (){
                 setState(() {
-                  playerNames.add(controller.text.trim());
-                  numberOfPlayers=numberOfPlayers+1;
+                  if(controller.text.trim().isNotEmpty){
+                    playerNames.add(controller.text.trim());
+                    numberOfPlayers=numberOfPlayers+1;
+                    controller.clear();
+                  }
                 });
 
               },
@@ -118,14 +157,18 @@ class _GameSetupState extends State<GameSetup> {
           Expanded(
             child: ListView.builder(
               itemCount: playerNames.length,
-              itemBuilder: (context, index){
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 0.5, horizontal: 5.0),
-                  child: Text(playerNames[index]),
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(playerNames[index]),
+                  trailing: IconButton(
+                    icon: Icon(Icons.remove_circle_outline),
+                    onPressed: () => _removePlayer(index),
+                  ),
                 );
               },
             ),
           ),
+
         ],
       ),
     );

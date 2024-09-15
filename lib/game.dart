@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:darts_with_friends/widgets/textInputForDarts.dart';
 import "package:darts_with_friends/main.dart";
 import 'package:darts_with_friends/widgets/navbar.dart';
+import 'package:darts_with_friends/firebaseOperations.dart';
 
 class GameScore{
   int dart1;
@@ -31,8 +32,21 @@ class GameScore{
   }
 }
 
+class PlayerStats{
+  int totalScore;
+  int totalDartsThrown;
+  PlayerStats(this.totalScore,this.totalDartsThrown);
+
+  double threeDartAverage() {
+    if (totalDartsThrown == 0) return 0; // Avoid division by zero
+    return (totalScore / totalDartsThrown)*3;
+  }
+
+}
+
 
 class Game extends StatefulWidget {
+
   final int numberOfPlayers;
   final List<String> playerNames;
   final int mainScore;
@@ -55,6 +69,7 @@ class _GameState extends State<Game> {
   String currentPlayerName="";
   List<GameScore> scoreList = [];
   int currentPlayerValue = 0;
+  List<PlayerStats> playerStats = [];
 
   @override
   void initState(){
@@ -62,8 +77,9 @@ class _GameState extends State<Game> {
 
     currentPlayerValue = widget.mainScore;
     playerScores = List<int>.filled(widget.numberOfPlayers,widget.mainScore);
+    playerStats = List<PlayerStats>.generate(widget.numberOfPlayers, (index)=>PlayerStats(0, 0),);
     currentPlayerName=widget.playerNames.first;
-    print(widget.gameMode);
+
   }
 
   void callSnackBarMessage(String message){
@@ -71,6 +87,8 @@ class _GameState extends State<Game> {
       SnackBar(content: Text(message)),
     );
   }
+
+
 
   void submitScore(){
     GameScore score = GameScore(
@@ -80,66 +98,46 @@ class _GameState extends State<Game> {
         currentPlayer);
     scoreList.add(score);
 
-
+    int dartSum = score.sumDarts();
 
     setState(() {
-      // TODO: edge case sa praznim textboxom/nulom da se broji kao pobjeda npr. 25,5,0 se broji kao pobjeda za double out
 
-      int previousScore = playerScores[currentPlayer - 1];
-      int currentScore = previousScore;
+      if(currentPlayerValue - dartSum == 0){
+        callSnackBarMessage(currentPlayerName + " has won!");
 
-      bool hasWonGame = false;
-      bool wentOver = false;
+        fetchWinnerUserAndUpdate(widget.playerNames[currentPlayer-1]);
 
+        List<String> tempPlayerNames = widget.playerNames;
+        tempPlayerNames.removeAt(currentPlayer-1);
+        tempPlayerNames.forEach((player){
+          fetchLoserUserAndUpdate(player);
+        });
 
-      if (currentScore - score.dart1 >= 0) {
-        currentScore -= score.dart1;
-        print("Checking first dart");
-        if (score.hasWon(currentScore, score.dart1, widget.gameMode)) {
-          hasWonGame = true;
-          callSnackBarMessage(currentPlayerName + " has won!");
-        }
-      } else {
-        wentOver = true;
-      }
+        Timer(Duration(seconds: 3), (){
+          Navigator.pop(context);
+        });
+      }else if(currentPlayerValue - dartSum < 0){
+        callSnackBarMessage(currentPlayerName + " has went overboard");
 
-
-      if (!hasWonGame && currentScore - score.dart2 >= 0) {
-        currentScore -= score.dart2;
-        print("Checking second dart");
-        if (score.hasWon(currentScore, score.dart2, widget.gameMode)) {
-          hasWonGame = true;
-          callSnackBarMessage(currentPlayerName + " has won!");
-        }
-      } else if (!hasWonGame) {
-        wentOver = true;
-      }
-
-
-      if (!hasWonGame && currentScore - score.dart3 >= 0) {
-        currentScore -= score.dart3;
-        print("Checking third dart");
-        if (score.hasWon(currentScore, score.dart3, widget.gameMode)) {
-          hasWonGame = true;
-          callSnackBarMessage(currentPlayerName + " has won!");
-        }
-      } else if (!hasWonGame) {
-        wentOver = true;
-      }
-
-
-      if (wentOver) {
-        print("Reverting score as player went overboard.");
-        currentScore = previousScore;
-      }
-
-      playerScores[currentPlayer - 1] = currentScore;
-
-      if (!hasWonGame) {
         currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
-        currentPlayerName = widget.playerNames[currentPlayer - 1];
-        currentPlayerValue = playerScores[currentPlayer - 1];
+        currentPlayerValue = playerScores[currentPlayer-1];
+        currentPlayerName = widget.playerNames[currentPlayer-1];
+      }else {
+
+        playerStats[currentPlayer-1].totalScore += dartSum;
+        playerStats[currentPlayer-1].totalDartsThrown +=3;
+
+        print(playerStats[currentPlayer-1].totalScore);
+        print(playerStats[currentPlayer-1].totalDartsThrown);
+
+        playerScores[currentPlayer-1] -= dartSum;
+        currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
+        currentPlayerValue = playerScores[currentPlayer-1];
+        currentPlayerName = widget.playerNames[currentPlayer-1];
       }
+
+
+
       });
     print(playerScores);
 

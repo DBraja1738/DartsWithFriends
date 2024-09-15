@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:darts_with_friends/widgets/navbarWithLoggedInUsers.dart';
 
 class AccountTab extends StatefulWidget {
   @override
@@ -9,6 +12,7 @@ class AccountTab extends StatefulWidget {
 
 class _AccountTabState extends State<AccountTab> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   final _formKey = GlobalKey<FormState>(); // Global key for the form
 
@@ -38,6 +42,11 @@ class _AccountTabState extends State<AccountTab> {
           await userCredential.user?.updateDisplayName(_usernameController.text.trim());
           await userCredential.user?.reload();
 
+          User? user = userCredential.user;
+          if (user != null) {
+            await saveUserToFirestore(user);  // Save to Firestore
+          }
+
           callSnackBarMessage("User registered: ${userCredential.user?.email}");
         } catch (e) {
           callSnackBarMessage("Error registering: $e");
@@ -57,7 +66,13 @@ class _AccountTabState extends State<AccountTab> {
           password: _passwordController.text.trim(),
         );
 
+        User? user = userCredential.user;
+        if (user != null) {
+          await saveUserToFirestore(user);  // Save to Firestore
+        }
+
         callSnackBarMessage("User logged in: ${userCredential.user?.email}");
+        _saveUser(userCredential.user?.email ?? "");
       } catch (e) {
         callSnackBarMessage("Error logging in: $e");
       }
@@ -65,7 +80,23 @@ class _AccountTabState extends State<AccountTab> {
 
   }
 
+  Future<void> saveUserToFirestore(User user) async {
+    CollectionReference usersCollection = firestore.collection('users');
+
+
+    await usersCollection.doc(user.uid).set({
+      'email': user.email,
+      'uid': user.uid,
+      "wins": 0,
+      "3dartAverage": 0,
+      "numberOfGames": 0,
+      "winrate": 0,
+    });
+  }
+
   Future<void> _saveUser(String email) async {
+    if (email == "") return;
+
     SharedPreferences loggedInUsers = await SharedPreferences.getInstance();
     List<String> emails = loggedInUsers.getStringList("emails") ?? [];
 
@@ -84,6 +115,7 @@ class _AccountTabState extends State<AccountTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: UserNavbar(),
       appBar: AppBar(
         title: Text("Account"),
       ),
