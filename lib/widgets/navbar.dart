@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:darts_with_friends/main.dart';
+import 'package:darts_with_friends/widgets/decorations.dart';
 class Navbar extends StatefulWidget {
   final List<String> initialPlayerNames;
   final List<int> initialPlayerScores;
@@ -35,25 +36,31 @@ class _NavbarState extends State<Navbar> {
             title: Text("End game"),
             content: Text("Are you sure to end the game?"),
             actions: [
-              TextButton(
-                onPressed: (){
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const Home()));
-                },
-                child: Text("Yes"),
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.red[500],
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                child: Text('No'),
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.green[500],
-                ),
-              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: (){
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const Home()));
+                    },
+                    child: Text("Yes", style: AppDecorations.playerTextStyle,),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.red[500],
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    child: Text('No', style: AppDecorations.playerTextStyle),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.green[500],
+                    ),
+                  ),
+                ],
+              )
+
             ],
           );
         }
@@ -65,9 +72,14 @@ class _NavbarState extends State<Navbar> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: Colors.green[500],
       child: ListView(
         children: <Widget>[
-          UserAccountsDrawerHeader(accountName: Text("Game stats"), accountEmail: Text("Scores and players")),
+          UserAccountsDrawerHeader(
+              accountName: Text("Game stats", style: AppDecorations.scoreTextStyle,),
+              accountEmail: Text("Scores and players", style: AppDecorations.scoreTextStyle),
+              decoration: AppDecorations.drawerHeaderDecoration,
+          ),
 
           ...List.generate(
               playerNames.length,

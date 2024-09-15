@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:darts_with_friends/widgets/decorations.dart';
 
 class PlayerTextInput extends StatelessWidget{
   final TextEditingController controller;
@@ -12,9 +12,7 @@ class PlayerTextInput extends StatelessWidget{
 
     return TextField(
       controller: controller,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(),
-      ),
+      decoration: AppDecorations.inputDecoration,
     );
   }
 }

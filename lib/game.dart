@@ -5,6 +5,7 @@ import 'package:darts_with_friends/widgets/textInputForDarts.dart';
 import "package:darts_with_friends/main.dart";
 import 'package:darts_with_friends/widgets/navbar.dart';
 import 'package:darts_with_friends/firebaseOperations.dart';
+import 'package:darts_with_friends/widgets/decorations.dart';
 
 class GameScore{
   int dart1;
@@ -165,6 +166,7 @@ class _GameState extends State<Game> {
     return Scaffold(
       drawer: Navbar(initialPlayerNames: widget.playerNames, initialPlayerScores: playerScores),
       appBar: AppBar(
+        backgroundColor: Colors.green[900],
         leading: Builder(
             builder: (BuildContext context){
               return IconButton(
@@ -177,32 +179,44 @@ class _GameState extends State<Game> {
         ),
         title: Text("Hello game"),
       ),
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Column(
+      body: Container(
+        decoration: AppDecorations.boxDecoration,
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Column(
 
-                children: [
-                  Text("Player: $currentPlayerName, $currentPlayer"),
-                  Text("$currentPlayerValue"),
-                ],
-              ),
-            ],
-          ),
+                  children: [
+                  Text("Player: $currentPlayerName, $currentPlayer", style: AppDecorations.playerTextStyle,),
+                  Text("$currentPlayerValue", style: AppDecorations.scoreTextStyle),
+                  ],
+                ),
+              ],
+            ),
           Row(
             children: <Widget>[
               Flexible(
-                  child: DartTextInput(controller: _dart1controller),
+                child: TextField(
+                  controller: _dart1controller,
+                  decoration: AppDecorations.inputDecoration,
+                )
               ),
               SizedBox(width: 10,),
               Flexible(
-                  child: DartTextInput(controller: _dart2controller),
+              child: TextField(
+                controller: _dart1controller,
+                decoration: AppDecorations.inputDecoration,
+              )
               ),
               SizedBox(width: 10,),
               Flexible(
-                  child: DartTextInput(controller: _dart3controller),
+                child: TextField(
+                  controller: _dart1controller,
+                  decoration: AppDecorations.inputDecoration,
+                )
               ),
             ],
           ),
@@ -210,14 +224,14 @@ class _GameState extends State<Game> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
 
-              ElevatedButton(onPressed: submitScore, child: Text("Submit score")),
-              ElevatedButton(onPressed: undoLastScore, child: Text("Undo last round")),
-
-            ],
-          )
+              ElevatedButton(onPressed: submitScore, child: Text("Submit score"), style: AppDecorations.buttonStyle,),
+              ElevatedButton(onPressed: undoLastScore, child: Text("Undo last round"), style: AppDecorations.buttonStyleRed,),
 
         ],
       )
+
+      ],
+    ),)
     );
 
   }

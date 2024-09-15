@@ -5,7 +5,7 @@ import 'package:darts_with_friends/game.dart';
 import 'package:darts_with_friends/preGameSetup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:darts_with_friends/accounts.dart';
-
+import "package:darts_with_friends/widgets/decorations.dart";
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -52,6 +52,7 @@ class Home extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
+                          style: AppDecorations.buttonStyle,
                             onPressed: (){
                               Navigator.push(context, MaterialPageRoute(builder: (context)=>const GameSetup()));
                             },
@@ -61,6 +62,7 @@ class Home extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
+                          style: AppDecorations.buttonStyleWhite,
                             onPressed: (){
                               Navigator.push(context, MaterialPageRoute(builder: (context)=> AccountTab()));
                             },
@@ -73,10 +75,7 @@ class Home extends StatelessWidget {
                           onPressed: (){
                             exit(0);
                           },
-                          style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.red[500]
-                          ),
+                          style: AppDecorations.buttonStyleRed,
                           child: Text("EXIT"),
 
                         ),

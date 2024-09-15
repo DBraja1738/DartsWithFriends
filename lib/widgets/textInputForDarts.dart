@@ -7,6 +7,7 @@ class DartTextInput extends StatelessWidget{
   const DartTextInput({
     Key? key,
     required this.controller,
+
 }): super(key: key);
   Widget build(BuildContext context){
     return TextField(
@@ -17,6 +18,7 @@ class DartTextInput extends StatelessWidget{
       ],
       decoration: InputDecoration(
         border: OutlineInputBorder(),
+
       ),
     );
   }

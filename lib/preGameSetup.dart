@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import "package:darts_with_friends/game.dart";
 import "package:darts_with_friends/widgets/textInputForPlayers.dart";
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:darts_with_friends/widgets/decorations.dart';
 
 class GameSetup extends StatefulWidget {
   const GameSetup({super.key});
@@ -56,8 +57,10 @@ class _GameSetupState extends State<GameSetup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green[600],
       appBar: AppBar(
         title: Text("Setup game"),
+        backgroundColor: Colors.green[900],
       ),
       body: Column(
         children: [
@@ -134,6 +137,7 @@ class _GameSetupState extends State<GameSetup> {
             child: PlayerTextInput(controller: controller),
           ),
           ElevatedButton(
+              style: AppDecorations.buttonStyleSubmit,
               onPressed: (){
                 setState(() {
                   if(controller.text.trim().isNotEmpty){
@@ -147,6 +151,7 @@ class _GameSetupState extends State<GameSetup> {
               child: Text("Submit name")
           ),
           ElevatedButton(
+              style: AppDecorations.buttonStyle,
               onPressed: numberOfPlayers < 2 ? callErrorMessage : (){
             Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Game(numberOfPlayers: numberOfPlayers, playerNames: playerNames, mainScore: selectedScore, gameMode: selectedGamemode)));
           },
