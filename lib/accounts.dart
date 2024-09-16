@@ -66,10 +66,6 @@ class _AccountTabState extends State<AccountTab> {
           password: _passwordController.text.trim(),
         );
 
-        User? user = userCredential.user;
-        if (user != null) {
-          await saveUserToFirestore(user);  // Save to Firestore
-        }
 
         callSnackBarMessage("User logged in: ${userCredential.user?.email}");
         _saveUser(userCredential.user?.email ?? "");

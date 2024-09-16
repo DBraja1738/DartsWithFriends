@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:364148159176:android:4bfccf52f9eff2ee466bfd",
+        "mobilesdk_app_id": "1:364148159176:android:91ec2ad455d8660a466bfd",
         "android_client_info": {
-          "package_name": "com.dbraja.darts_with_friends"
+          "package_name": "com.example.darts_with_friends"
         }
       },
       "oauth_client": [],

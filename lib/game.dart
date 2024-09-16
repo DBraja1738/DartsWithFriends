@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import "package:flutter/services.dart";
 import 'dart:async';
-import 'package:darts_with_friends/widgets/textInputForDarts.dart';
-import "package:darts_with_friends/main.dart";
 import 'package:darts_with_friends/widgets/navbar.dart';
 import 'package:darts_with_friends/firebaseOperations.dart';
 import 'package:darts_with_friends/widgets/decorations.dart';
+import 'package:vibration/vibration.dart';
 
 class GameScore{
   int dart1;
@@ -83,6 +82,25 @@ class _GameState extends State<Game> {
 
   }
 
+  void playVictoryBuzz() async {
+    // Check if the device has vibration capabilities
+    if (await Vibration.hasVibrator() ?? false) {
+      // [trajanje u ms, pauza u ms, ....]
+      List<int> pattern = [500, 300, 500, 300, 700, 400, 500];
+
+      // intenzitet vibracije ako ima podršku
+      List<int>? intensities = [128, 255, 128, 255, 255, 128, 255];
+
+      Vibration.vibrate(pattern: pattern, intensities: intensities);
+    }
+  }
+
+  void shortBuzz() async {
+    if (await Vibration.hasVibrator() ?? false) {
+      Vibration.vibrate(duration: 100);
+    }
+  }
+
   void callSnackBarMessage(String message){
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
@@ -108,6 +126,7 @@ class _GameState extends State<Game> {
       }
       if(currentPlayerValue - dartSum == 0){
         callSnackBarMessage(currentPlayerName + " has won!");
+        playVictoryBuzz();
 
         fetchWinnerUserAndUpdate(widget.playerNames[currentPlayer-1], playerStats[currentPlayer-1].totalDartsThrown, playerStats[currentPlayer-1].totalScore);
         playerStats.removeAt(currentPlayer-1);
@@ -137,6 +156,8 @@ class _GameState extends State<Game> {
         currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
         currentPlayerValue = playerScores[currentPlayer-1];
         currentPlayerName = widget.playerNames[currentPlayer-1];
+
+        shortBuzz();
       }
 
 
@@ -204,6 +225,10 @@ class _GameState extends State<Game> {
                 child: TextField(
                   controller: _dart1controller,
                   decoration: AppDecorations.inputDecoration,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
                 )
               ),
               SizedBox(width: 10,),
@@ -211,6 +236,10 @@ class _GameState extends State<Game> {
               child: TextField(
                 controller: _dart2controller,
                 decoration: AppDecorations.inputDecoration,
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
               )
               ),
               SizedBox(width: 10,),
@@ -218,6 +247,10 @@ class _GameState extends State<Game> {
                 child: TextField(
                   controller: _dart3controller,
                   decoration: AppDecorations.inputDecoration,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
                 )
               ),
             ],

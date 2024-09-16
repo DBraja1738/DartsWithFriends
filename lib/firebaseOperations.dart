@@ -77,7 +77,7 @@ void fetchLoserUserAndUpdate(String email, int numberOfDartsThrown, int totalSco
     int currentLifetimeScore = userData["lifetimeScore"] ?? 0;
 
 
-    int updatedWins = currentWins+1;
+
     int updatedGames = currentGames+1;
     int updatedLifetimeDarts = currentLifetimeDarts += numberOfDartsThrown;
     int updatedLifetimeScore = currentLifetimeScore += totalScore;

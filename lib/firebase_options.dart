@@ -42,7 +42,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: apikey, //ne zaboraviti uzeti novi api key ako sam na drugom PC
+    apiKey: 'AIzaSyDVXgrWghsPk6_8L5w4XrV7v0ndkLIXwDM',
     appId: '1:364148159176:web:c1f6c4cf922f429d466bfd',
     messagingSenderId: '364148159176',
     projectId: 'darts-with-friends',
@@ -51,15 +51,15 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: apikey,
-    appId: '1:364148159176:android:4bfccf52f9eff2ee466bfd',
+    apiKey: 'AIzaSyACaZfYq47_JubZ0-nF2E8XcL4vi-teP38',
+    appId: '1:364148159176:android:91ec2ad455d8660a466bfd',
     messagingSenderId: '364148159176',
     projectId: 'darts-with-friends',
     storageBucket: 'darts-with-friends.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: apikey,
+    apiKey: 'AIzaSyCSbNPxckiloaX-a4QKL323oDUp_LhiV5A',
     appId: '1:364148159176:ios:11e92f3dbb75d459466bfd',
     messagingSenderId: '364148159176',
     projectId: 'darts-with-friends',
@@ -68,7 +68,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: apikey,
+    apiKey: 'AIzaSyCSbNPxckiloaX-a4QKL323oDUp_LhiV5A',
     appId: '1:364148159176:ios:11e92f3dbb75d459466bfd',
     messagingSenderId: '364148159176',
     projectId: 'darts-with-friends',
@@ -77,11 +77,12 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: apikey,
+    apiKey: 'AIzaSyDVXgrWghsPk6_8L5w4XrV7v0ndkLIXwDM',
     appId: '1:364148159176:web:522597a8480bef8e466bfd',
     messagingSenderId: '364148159176',
     projectId: 'darts-with-friends',
     authDomain: 'darts-with-friends.firebaseapp.com',
     storageBucket: 'darts-with-friends.appspot.com',
   );
+
 }

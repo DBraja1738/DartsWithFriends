@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:darts_with_friends/game.dart';
 import 'package:darts_with_friends/preGameSetup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:darts_with_friends/accounts.dart';
@@ -11,7 +10,7 @@ void main() async{
   await Firebase.initializeApp();
   runApp(const MaterialApp(
     home: Home(),
-
+    debugShowCheckedModeBanner: false,
   )
   );
 }
