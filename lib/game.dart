@@ -22,14 +22,7 @@ class GameScore{
     return dart1clamped+dart2clamped+dart3clamped;
   }
 
-  bool hasWon(int currentScore, int dartThrown, bool gamemode){
-    if(currentScore - dartThrown == 0){
-      if(gamemode){
-        return dartThrown<=20; //single out
-      }else return dartThrown<=40 && dartThrown.isEven && dartThrown != 0; //dupli out
-    }
-    return false;
-  }
+
 }
 
 class PlayerStats{
@@ -83,7 +76,7 @@ class _GameState extends State<Game> {
   }
 
   void playVictoryBuzz() async {
-    // Check if the device has vibration capabilities
+
     if (await Vibration.hasVibrator() ?? false) {
       // [trajanje u ms, pauza u ms, ....]
       List<int> pattern = [500, 300, 500, 300, 700, 400, 500];
@@ -108,6 +101,35 @@ class _GameState extends State<Game> {
   }
 
 
+  bool hasWon(int currentScore, int dartThrown, bool gamemode){
+    if(currentScore - dartThrown == 0){
+      if(gamemode){
+        return dartThrown<=20; //single out
+      }else return dartThrown<=40 && dartThrown.isEven && dartThrown != 0;//dupli out
+    }
+    return false;
+  }
+
+  void declareVictor(){
+    callSnackBarMessage(currentPlayerName + " has won!");
+    playVictoryBuzz();
+
+    fetchWinnerUserAndUpdate(widget.playerNames[currentPlayer-1], playerStats[currentPlayer-1].totalDartsThrown, playerStats[currentPlayer-1].totalScore);
+    playerStats.removeAt(currentPlayer-1);
+    List<String> tempPlayerNames = widget.playerNames;
+    tempPlayerNames.removeAt(currentPlayer-1);
+
+    for(int i=0;i<tempPlayerNames.length;i++){
+      fetchLoserUserAndUpdate(tempPlayerNames[i], playerStats[i].totalDartsThrown, playerStats[i].totalScore);
+    }
+    //tempPlayerNames.forEach((player){
+    // fetchLoserUserAndUpdate(player);
+    //});
+
+    Timer(Duration(seconds: 3), (){
+      Navigator.pop(context);
+    });
+  }
 
   void submitScore(){
     GameScore score = GameScore(
@@ -116,50 +138,54 @@ class _GameState extends State<Game> {
         (int.tryParse(_dart3controller.text) ?? 0).clamp(0, 60),
         currentPlayer);
     scoreList.add(score);
-
+    int minimumScore = widget.gameMode ? 1 : 2;
     int dartSum = score.sumDarts();
 
     setState(() {
-      if(currentPlayerValue - dartSum >= 0){
-        playerStats[currentPlayer-1].totalScore += dartSum;
+      if(currentPlayerValue - dartSum > minimumScore){
+        playerStats[currentPlayer-1].totalScore +=dartSum;
         playerStats[currentPlayer-1].totalDartsThrown +=3;
-      }
-      if(currentPlayerValue - dartSum == 0){
-        callSnackBarMessage(currentPlayerName + " has won!");
-        playVictoryBuzz();
 
-        fetchWinnerUserAndUpdate(widget.playerNames[currentPlayer-1], playerStats[currentPlayer-1].totalDartsThrown, playerStats[currentPlayer-1].totalScore);
-        playerStats.removeAt(currentPlayer-1);
-        List<String> tempPlayerNames = widget.playerNames;
-        tempPlayerNames.removeAt(currentPlayer-1);
+        playerScores[currentPlayer-1] -=dartSum;
+        currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
 
-        for(int i=0;i<tempPlayerNames.length;i++){
-          fetchLoserUserAndUpdate(tempPlayerNames[i], playerStats[i].totalDartsThrown, playerStats[i].totalScore);
+        currentPlayerValue = playerScores[currentPlayer-1];
+        currentPlayerName = widget.playerNames[currentPlayer-1];
+      } else if(currentPlayerValue - dartSum == 0){
+
+        if(hasWon(playerScores[currentPlayer-1], score.dart1, widget.gameMode)){
+          declareVictor();
+          return;
+        }else if(hasWon(playerScores[currentPlayer-1] - score.dart1, score.dart2, widget.gameMode)){
+          declareVictor();
+          return;
+        }else if(hasWon(playerScores[currentPlayer-1] - score.dart1 - score.dart2, score.dart3, widget.gameMode)){
+          declareVictor();
+          return;
+        }else{
+          callSnackBarMessage(currentPlayerName + " has went overboard");
+
+
+          scoreList.last.dart1 = 0;
+          scoreList.last.dart2 = 0;
+          scoreList.last.dart3 = 0; // nuliraj sve inače ako revertaš potez koji je otisao preko nastane problem
+
+          currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
+          currentPlayerValue = playerScores[currentPlayer-1];
+          currentPlayerName = widget.playerNames[currentPlayer-1];
         }
-        //tempPlayerNames.forEach((player){
-         // fetchLoserUserAndUpdate(player);
-        //});
 
-        Timer(Duration(seconds: 3), (){
-          Navigator.pop(context);
-        });
-      }else if(currentPlayerValue - dartSum < 0){
+      }else{
         callSnackBarMessage(currentPlayerName + " has went overboard");
 
+        scoreList.last.dart1 = 0;
+        scoreList.last.dart2 = 0;
+        scoreList.last.dart3 = 0;
+
         currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
         currentPlayerValue = playerScores[currentPlayer-1];
         currentPlayerName = widget.playerNames[currentPlayer-1];
-      }else {
-
-
-        playerScores[currentPlayer-1] -= dartSum;
-        currentPlayer = (currentPlayer % widget.numberOfPlayers) + 1;
-        currentPlayerValue = playerScores[currentPlayer-1];
-        currentPlayerName = widget.playerNames[currentPlayer-1];
-
-        shortBuzz();
       }
-
 
 
       });
