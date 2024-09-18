@@ -117,92 +117,97 @@ class _AccountTabState extends State<AccountTab> {
       appBar: AppBar(
         title: Text("Account"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                _isRegistering ? "Register" : "Login",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              if (_isRegistering)
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _isRegistering ? "Register" : "Login",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                if (_isRegistering)
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(labelText: "Username"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your username';
+                      }
+                      return null;
+                    },
+                  ),
+                SizedBox(height: 20),
                 TextFormField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(labelText: "Username"),
+                  controller: _emailController,
+                  decoration: InputDecoration(labelText: "Email"),
+                  keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your username';
+                      return 'Please enter your email';
+                    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                      return 'Please enter a valid email address';
                     }
                     return null;
                   },
                 ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: "Email"),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Please enter a valid email address';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                controller: _passwordController,
-                decoration: InputDecoration(labelText: "Password"),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  } else if (value.length < 6) {
-                    return 'Password must be at least 6 characters long';
-                  }
-                  return null;
-                },
-              ),
-              if (_isRegistering) // Show confirm password only if registering
-                Column(
-                  children: [
-                    SizedBox(height: 10),
-                    TextFormField(
-                      controller: _confirmPasswordController,
-                      decoration: InputDecoration(labelText: "Confirm Password"),
-                      obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please confirm your password';
-                        } else if (value != _passwordController.text) {
-                          return 'Passwords do not match';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
+                SizedBox(height: 10),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(labelText: "Password"),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    } else if (value.length < 6) {
+                      return 'Password must be at least 6 characters long';
+                    }
+                    return null;
+                  },
                 ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _isRegistering ? _register : _login,
-                child: Text(_isRegistering ? "Register" : "Login"),
-              ),
-              SizedBox(height: 20),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _isRegistering = !_isRegistering;
-                  });
-                },
-                child: Text(_isRegistering
-                    ? "Already have an account? Login"
-                    : "Don't have an account? Register"),
-              ),
-            ],
+                if (_isRegistering)
+                  Column(
+                    children: [
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: _confirmPasswordController,
+                        decoration: InputDecoration(labelText: "Confirm Password"),
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please confirm your password';
+                          } else if (value != _passwordController.text) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _isRegistering ? _register : _login,
+                  child: Text(_isRegistering ? "Register" : "Login"),
+                ),
+                SizedBox(height: 20),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _isRegistering = !_isRegistering;
+                    });
+                  },
+                  child: Text(
+                    _isRegistering
+                        ? "Already have an account? Login"
+                        : "Don't have an account? Register",
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
